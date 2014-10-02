@@ -6,12 +6,13 @@ from infernyx.rules import impression_stats_init, parse_date, parse_ip, parse_ua
 from functools import partial
 from config_infernyx import *
 
+AUTO_RUN = False
+
 
 def parse_tiles(parts, params):
-    import sys
     """Yield a single record, just for the newtabs"""
 
-    vals = {'clicks': 0, 'impressions': 0, 'pinned': 0, 'blocked': 0,
+    vals = {'position': -1, 'tile_id': -1, 'clicks': 0, 'impressions': 0, 'pinned': 0, 'blocked': 0,
             'sponsored': 0, 'sponsored_link': 0, 'newtabs': 1}
 
     del parts['tiles']
