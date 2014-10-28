@@ -2,11 +2,16 @@ from inferno.lib.rule import chunk_json_stream
 from inferno.lib.rule import InfernoRule
 from inferno.lib.rule import Keyset
 from infernyx.database import insert_postgres, insert_redshift
-from infernyx.rules import impression_stats_init, parse_date, parse_ip, parse_ua, combiner, count
+from infernyx.rules import impression_stats_init, parse_date, parse_ip, parse_ua, combiner
 from functools import partial
 from config_infernyx import *
 
 AUTO_RUN = False
+
+
+def count(parts, params):
+    parts['count'] = 1
+    yield parts
 
 
 def parse_tiles(parts, params):
