@@ -1,6 +1,5 @@
 from inferno.lib.rule import chunk_json_stream
 from inferno.lib.rule import InfernoRule
-from config_infernyx import *
 import logging
 from functools import partial
 
@@ -13,18 +12,6 @@ def combiner(key, value, buf, done, params):
         buf[key] = [a + b for a, b in zip(buf.get(key, [0] * i), value)]
     else:
         return buf.iteritems()
-
-
-def impression_stats_init(input_iter, params):
-    import geoip2.database
-    import re
-    try:
-        geoip_file = params.geoip_file
-    except Exception as e:
-        # print "GROOVY: %s" % e
-        geoip_file = './GeoLite2-Country.mmdb'
-    params.geoip_db = geoip2.database.Reader(geoip_file)
-    params.ip_pattern = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
 
 
 def clean_data(parts, params, imps=True):
@@ -132,9 +119,7 @@ RULES = [
         name='ip_click_counter',
         source_tags=['incoming:impression'],
         map_input_stream=chunk_json_stream,
-        map_init_function=impression_stats_init,
         parts_preprocess=[clean_data, parse_tiles, partial(filter_all, tile_id=504, clicks=1), count],
-        geoip_file=GEOIP,
         partitions=32,
         sort_buffer_size='25%',
         combiner_function=combiner,
