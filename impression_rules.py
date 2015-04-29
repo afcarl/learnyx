@@ -1,4 +1,3 @@
-from statsd import StatsClient
 from inferno.lib.rule import chunk_json_stream
 from inferno.lib.rule import InfernoRule
 from config_infernyx import *
@@ -6,8 +5,6 @@ import logging
 from functools import partial
 
 log = logging.getLogger(__name__)
-AUTORUN = True
-statsd = StatsClient(**STATSD)
 
 
 def combiner(key, value, buf, done, params):
