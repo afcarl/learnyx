@@ -19,7 +19,6 @@ def clean_data(parts, params, imps=True):
     try:
         if imps:
             assert parts['tiles'][0] is not None
-        assert params.ip_pattern.match(parts['ip'])
         assert datetime.datetime.fromtimestamp(parts['timestamp'] / 1000.0)
         parts['locale'] = parts['locale'][:12]
         if parts.get('action'):
@@ -107,9 +106,11 @@ def parse_tiles(parts, params):
         print "Error parsing tiles: %s" % str(tiles)
 
 
-def filter_x(parts, params, **kwargs):
-    if parts['tile_id'] == 504 and parts['clicks'] > 0:
-        yield parts
+def filter_all(parts, params, **kwargs):
+    for col, val in kwargs.items():
+        if col and parts[col] != val:
+            return
+    yield parts
 
 
 def filter_clicks(keys, vals, params, threshold=1):
@@ -121,7 +122,7 @@ RULES = [
         name='ip_click_counter',
         source_tags=['incoming:impression'],
         map_input_stream=chunk_json_stream,
-        parts_preprocess=[clean_data, parse_tiles, filter_x, count],
+        parts_preprocess=[clean_data, parse_tiles, partial(filter_all, tile_id=504, clicks=1), count],
         partitions=32,
         sort_buffer_size='25%',
         combiner_function=combiner,
