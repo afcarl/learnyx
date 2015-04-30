@@ -107,11 +107,9 @@ def parse_tiles(parts, params):
         print "Error parsing tiles: %s" % str(tiles)
 
 
-def filter_all(parts, params, **kwargs):
-    for col, val in kwargs.items():
-        if col is not None and parts[col] != val:
-            return
-    yield parts
+def filter_x(parts, params, **kwargs):
+    if parts['tile_id'] == 504 and parts['clicks'] > 0:
+        yield parts
 
 
 def filter_clicks(keys, vals, params, threshold=1):
@@ -123,7 +121,7 @@ RULES = [
         name='ip_click_counter',
         source_tags=['incoming:impression'],
         map_input_stream=chunk_json_stream,
-        parts_preprocess=[clean_data, parse_tiles, partial(filter_all, tile_id=504, clicks=1), count],
+        parts_preprocess=[clean_data, parse_tiles, filter_x, count],
         partitions=32,
         sort_buffer_size='25%',
         combiner_function=combiner,
