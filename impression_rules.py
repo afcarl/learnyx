@@ -109,7 +109,7 @@ def parse_tiles(parts, params):
 
 def filter_all(parts, params, **kwargs):
     for col, val in kwargs.items():
-        if parts[col] != val:
+        if col is not None and parts[col] != val:
             return
     yield parts
 
