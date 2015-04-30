@@ -40,68 +40,23 @@ def parse_tiles(parts, params):
         otherwise it's an impression, emit all of the records"""
     tiles = parts.get('tiles')
 
-    position = None
-    vals = {'clicks': 0, 'impressions': 0, 'pinned': 0, 'blocked': 0,
-            'sponsored': 0, 'sponsored_link': 0, 'newtabs': 0, 'enhanced': False}
-    view = parts.get('view', sys.maxint)
-
     try:
 
         # now prepare values for emitting this particular event
         if parts.get('click') is not None:
             position = parts['click']
-            vals['clicks'] = 1
-            tiles = [tiles[position]]
-        elif parts.get('pin') is not None:
-            position = parts['pin']
-            vals['pinned'] = 1
-            tiles = [tiles[position]]
-        elif parts.get('block') is not None:
-            position = parts['block']
-            vals['blocked'] = 1
-            tiles = [tiles[position]]
-        elif parts.get('sponsored') is not None:
-            position = parts['sponsored']
-            vals['sponsored'] = 1
-            tiles = [tiles[position]]
-        elif parts.get('sponsored_link') is not None:
-            position = parts['sponsored_link']
-            vals['sponsored_link'] = 1
-            tiles = [tiles[position]]
-        else:
-            vals['impressions'] = 1
-            cparts = parts.copy()
-            del cparts['tiles']
-            cparts['newtabs'] = 1
-            yield cparts
+            tile = tiles[position]
 
-        del parts['tiles']
+            del parts['tiles']
 
-        # emit all relavant tiles for this action
-        for i, tile in enumerate(tiles):
             # print "Tile: %s" % str(tile)
             cparts = parts.copy()
-            cparts.update(vals)
-
-            # the position can be specified implicity or explicity
-            if tile.get('pos') is not None:
-                slot = tile['pos']
-            elif position is None:
-                slot = i
-            else:
-                slot = position
-            assert position < 1024
-            cparts['position'] = slot
-
-            url = tile.get('url')
-            if url:
-                cparts['enhanced'] = True
-                cparts['url'] = url
+            cparts['clicks'] = 1
 
             tile_id = tile.get('id')
-            if tile_id is not None and isinstance(tile_id, int) and tile_id < 1000000 and slot <= view:
+            if tile_id is not None and isinstance(tile_id, int) and tile_id < 1000000:
                 cparts['tile_id'] = tile_id
-            yield cparts
+                yield cparts
     except:
         print "Error parsing tiles: %s" % str(tiles)
 
