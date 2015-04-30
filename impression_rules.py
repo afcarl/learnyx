@@ -114,6 +114,10 @@ def filter_all(parts, params, **kwargs):
     yield parts
 
 
+def filter_clicks(keys, vals, params, threshold=1):
+    if vals[0] > threshold:
+        yield keys, vals
+
 RULES = [
     InfernoRule(
         name='ip_click_counter',
@@ -125,5 +129,6 @@ RULES = [
         combiner_function=combiner,
         key_parts=['ip'],
         value_parts=['count'],
+        parts_postprocess=[partial(filter_clicks, threshold=1)],
     ),
 ]
